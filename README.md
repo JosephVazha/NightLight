@@ -1,4 +1,4 @@
-#Nightlight
+# Nightlight
 
 An STM32F446RE-based automatic nightlight that measures ambient light with a photoresistor, and as the environment becomes darker, turns the LEDs on sequentially and smoothly increases their brightness. The system uses a hardware-timer-triggered ADC, interrupt-driven processing, and PWM output.
 
@@ -7,7 +7,7 @@ Demo:
 
 ---
 
-##Overview
+## Overview
 Nightlight converts a real-world analog light measurement into a digital control signal and uses that signal to control three LEDs.
 
 The system follows this signal path:
