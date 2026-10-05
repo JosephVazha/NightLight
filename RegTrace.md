@@ -216,10 +216,8 @@ Therefore:
 
 
 $$
-f_{TIM2}
-=
+f_{TIM2} = 
 \frac{10 kHz}{100}
-
 100 Hz
 $$
 
@@ -278,11 +276,10 @@ TIM3 generates the PWM signals used to control the three LEDs.
 
 The 84 MHz TIM3 clock is divided by 84:
 
-\[
-\frac{84\text{ MHz}}{83+1}
-=
+$$
+\frac{84\text{ MHz}}{83+1} = 
 1\text{ MHz}
-\]
+$$
 
 Therefore, each timer count is 1 μs.
 
@@ -300,13 +297,11 @@ The timer counts through 1000 values before restarting.
 
 Therefore:
 
-\[
-f_{PWM}
-=
-\frac{1\text{ MHz}}{1000}
-=
+$$
+f_{PWM} =
+\frac{1\text{ MHz}}{1000} =
 1\text{ kHz}
-\]
+$$
 
 The 1000-count period also provides 1000 possible compare values for
 controlling the PWM duty cycle.
