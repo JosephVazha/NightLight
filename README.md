@@ -185,3 +185,31 @@ The firmware does not continuously poll the ADC and does not use blocking delays
 For testing, the onboard DAC can be enabled using the ENABLE_DAC_SELFTEST flag. The DAC outputs a controlled voltage on PA4, the same physical pin used by the photoresistor ADC input. This allows the ADC-to-PWM portion of the system to be tested with a repeatable analog signal without changing the hardware, just by disconnecting the photoresistor voltage divider from PA4.
 
 The DAC is configured with no hardware trigger. Instead, its value is updated from the ADC conversion-complete callback. Therefore, TIM2 does not directly trigger the DAC.  This means that the DAC simply generates the value for the next ADC conversion, which is fine since all we are doing is sweeping through the approximate range of the photoresistor to tune transitioning and ensuring our LEDs are changing in brightness smmothly.
+
+
+---
+
+# 3. Testing & Obstacles
+I tested the system incrementally rather than trying to debug the entire system at once. This made it easier to identify whether an issue was coming from the sensor, ADC, interrupts, or LED control.
+
+## ADC & Photoresistor
+
+The first version of the firmware only sampled the photoresistor. The goal was simply to confirm that the ADC was receiving the correct value before adding any LED control. Initially, this did not work because I had wired the photoresistor circuit incorrectly. I used the debugger to trace the program through the ADC interrupt and check the ADC value after each conversion. Once the circuit was corrected, I was able to stop at each ADC conversion and observe the light level changing as I covered and uncovered the photoresistor. This established that the photoresistor and analog to digital conversion was behaving as I expected. I also tested whether the LEDs in my circuit would interfere with this reading, hooking them up to a constant 3.3V, but found that by simply pointing the LEDs far enough away from the photoresistor prevented them from interfering with the ambient light sensing.
+
+## PWM Control
+
+Once the ADC was working, I added PWM control. I just cycled across a range of duty cycles. This was useful for realizing that the PWM outputs, particularly at higher duty cycles, seemed to have little to no difference on the brightness. It led me to implement a nonlinear relationship between ambient brightness level and PWM, as I wanted the ambient brightness level to be more closely related to the LED brightness level.
+
+## DAC Sweeps
+
+I then implemented the DAC self-test so that I could test the ADC and PWM without relying on changes in room lighting.
+
+My first approach gave the DAC its own interrupt and attempted to coordinate the DAC and ADC timing separately. This made the timing unnecessarily complicated because I had two interrupt-driven processes that needed to stay synchronized.
+
+I struggled with this a lot until I realized I could update the DAC value inside the ADC conversion-complete callback. Each time the ADC finished measuring the previous DAC value, the callback changed the DAC to the next value. The next ADC conversion then measured that new value. This provided a simpler and more elegant solution.
+
+With the DAC self-test working, I continuously swept the DAC through its range and observed the LED response. At first, my sweeping was based on a large array of brightness values, but this didn't allow me to really optimize the PWM transition as I would have liked. The LEDs were changing according to the calculated PWM values, but I had no way of telling if they were smooth, so I implemented a counter. This allowed me to more effectively see if my transitions were satisfactorily smooth. I think spending a lot of time here paid off, because the final output didn't need much adjusting. Here are the video results of that test: [Link](https://youtu.be/Cz7GKYcbBoM)
+
+## End to End
+
+Finally I performed an end-to-end test, hooking in the photoresistor and varying the brightness by occluding the light with my hand. Initially, I had a minor additional issue, with the blue LED refusing to turn on, even at the darkest levels of my room. However, I realized that although I had pointed the LEDs in my circuit to face away from the photoresistor, the LEDs on the Nucleo dev baord were strong enough to interfere with the photoresistor, even though I had tried to place my breadboard on top of the dev boards LEDs to mititage this. By simply covering these with a thick cloth, before placing the breadboard. I was able to prevent this from interfering. Overall, I'm really happy with the result, as the transitions were really smooth and responded effectively to ambient light.: [Link](https://www.youtube.com/shorts/aKtNGqWCgg0)
