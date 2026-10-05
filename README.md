@@ -10,12 +10,6 @@ Demo: [Link](https://www.youtube.com/shorts/aKtNGqWCgg0)
 ## Overview
 Nightlight converts a real-world analog light measurement into a digital control signal and uses that signal to control three LEDs.
 
-The system follows this signal path:
-
-(Insert Diagram)
-
-The ADC is triggered periodically by a hardware timer, and all sensor processing occurs inside the ADC interrupt callback. The main loop remains entirely event-driven.
-
 ---
 ## Goals
 
@@ -150,9 +144,14 @@ We used PA4 for the photoresistor because it can be configured as an ADC input a
 
 We used PA6, PA7, and PB0 for the LEDs because they correspond to TIM3 channels 1, 2, and 3, supporting TIM3 PWM outputs, allowing the LED brightness to be controlled directly by hardware timers. Using three channels of the same timer also allows all three LEDs to share the same frequency while their duty cycles are independently controlled.
 
+The complete circuit schematic is shown below.
+
 <img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
 ---
 # 2. Firmware
+
+<img width="885" height="291" alt="image" src="https://github.com/user-attachments/assets/04c6c625-893c-4fe5-9054-1fddd7d60889" />
+
 
 
 
