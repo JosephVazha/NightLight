@@ -3,7 +3,7 @@
 An STM32F446RE-based automatic nightlight that measures ambient light with a photoresistor, and as the environment becomes darker, turns the LEDs on sequentially and smoothly increases their brightness. The system uses a hardware-timer-triggered ADC, interrupt-driven processing, and PWM output.
 
 
-Demo:
+Demo: [Link](https://www.youtube.com/shorts/aKtNGqWCgg0)
 
 ---
 
