@@ -151,8 +151,8 @@ We used PA4 for the photoresistor because it can be configured as an ADC input a
 We used PA6, PA7, and PB0 for the LEDs because they correspond to TIM3 channels 1, 2, and 3, supporting TIM3 PWM outputs, allowing the LED brightness to be controlled directly by hardware timers. Using three channels of the same timer also allows all three LEDs to share the same frequency while their duty cycles are independently controlled.
 
 <img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
-
-## Firmware Design
+---
+# 2. Firmware
 
 
 
