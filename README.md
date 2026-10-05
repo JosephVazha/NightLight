@@ -121,22 +121,13 @@ $$
 
 ST specifies that the GPIOs can source or sink up to 8 mA under the specified output-voltage conditions. The total current across the GPIOs must also remain within the device's absolute maximum ratings.
 
-We selected 200 Ω resistors for all three LEDs. Using the measured forward voltage of each LED, the expected current can be calculated as:
+We selected 200 Ω resistors for all three LEDs. Using the measured forward voltage of each LED between 2-3 V depending on the color, the expected current can be calculated as:
 
 $$
 I_{LED}=\frac{3.3-V_F}{200\Omega}
 $$
 
-For example, if the measured forward voltage of an LED is $V_F=2.0$ V:
-
-$$
-I_{LED}=\frac{3.3-2.0}{200}
-\approx 6.5\text{ mA}
-$$
-
-This keeps the LED current below the STM32's 8 mA GPIO specification under the normal output-voltage conditions while providing sufficient current for visible illumination. Although we do not know the exact current rating of the LED, by keeping the current Using a larger resistor would further reduce GPIO and LED current, but would also reduce the available LED brightness.
-
-Because the three LEDs are driven independently, the maximum combined LED current is approximately the sum of their individual currents. This remains well below the STM32F446RE's total GPIO current limits.
+This keeps the LED current below the current limit of the LED (which we don't know exactly, but presume is on the order of 10s of mA) and the STM32's 8 mA GPIO specification under the normal output-voltage conditions while providing sufficient current for visible illumination. Using a larger resistor would further reduce GPIO and LED current, but would also reduce the available LED brightness.
 
 ### Final Schematic
 
@@ -149,9 +140,44 @@ The complete circuit schematic is shown below.
 <img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
 ---
 # 2. Firmware
+## System Architecture
+### Data Flow
+The system uses a hardware timer-triggered ADC and interrupt-driven processing to convert ambient light into PWM0controlled LED brightness. The main signal path is shown below:
 
-<img width="885" height="291" alt="image" src="https://github.com/user-attachments/assets/04c6c625-893c-4fe5-9054-1fddd7d60889" />
+<img width="876" height="320" alt="image" src="https://github.com/user-attachments/assets/3ba06b6f-67c2-4676-9483-a965de7be968" />
+
+During normal operation, the photoresistor and fixed resistor form a voltage divider connected to PA4 (the Analog Digital Converter input). As the ambient light changes, the voltage at PA4 changes and is converted by the 12-bit ADC into a value from 0 to 4095.
+
+TIM2 provides the sampling clock for the system. It is configured with a pre-scaler of 8399 and a period of 99. 
+$$
+f_{TIM2}=\frac{84 MHz}{(8399+1)(99+1)} = 100Hz
+$$
+This generates a trigger output signal every 10 ms for the ADC. This allows the ADC to be sampled at a known fixed hardware-defined rate. We selected this value because we assumed that changes to ambient light indoors are typically made from turning on or off a switch or occluding light sources, which would change much slower than 10 ms. It would also likely be beyond the perception of a human. Sampling more frequently would provide very limited practiccal benefit, and unecessarily create more processing. We also validated this in our final end to end system test, where the response of the LEDs to the change in ambient light was as desired.
 
 
+When  TIM2 generates a TRGO event, the ADC begins a conversion of the voltage across the 22kΩ resistor in the photoresistor voltage divider.The ADC uses 12-bit resolution, producing a value from 0 to 4095. An 84-cycle sampling time was selected to provide sufficient acquisition time for the photoresistor voltage-divider signal. With an 21 MHz clock for the ADC, this would give us about 4 uS of sampling before conversion, which is plenty given we have 10 ms between samples. Making this longer could give the ADC more time to settle, but we chose not to modify this given our satisfaction with the end-to-end testing.
 
+Once the conversion is complete, the ADC generates an interrupt and the firmware enters HAL_ADC_ConvCpltCallback(). The callback reads the ADC value and calculates the darkness of the environment.
 
+The resulting darkness value is divided into three equal ranges. In the first third, the red LED ramps from off to full brightness. In the second third, red remains fully illuminated while green ramps up. In the final third, red and green remain fully illuminated while blue ramps up.
+
+The LED order was chosen as red, green, blue, in order of greatest to least ambient light. Red provides a warm first stage, while blue is reserved for the darkest portion of the nightlight's operating range, to create a visual progression as the environment gets darker. The blue LED also shines brighter, due to the difference in their voltage drop.
+
+The calculated LED brightness values are converted into PWM duty cycles. A quadratic correction is applied to each duty cycle before it is written to the PWM outputs. This was chosen because a linear change in PWM duty cycle does not appear linear to the human eye, so the quadratic mapping helps provide a smoother perceived brightness increase.
+
+The resulting duty cycles are written to the three TIM3 compare channels, which acts as the PWM generator. It operates at 1kHz, with a prescaler of 83 and a period of 999. 
+
+$$
+f_{PWM}=\frac{84 MHz}{(83+1)(999+1)}
+$$
+
+This was chosen to make for potential easy debugging on a scope and provide fast enough LED toggling without a low-frequency flicker.
+
+### Event-Driven Operation
+The firmware does not continuously poll the ADC and does not use blocking delays. After initialization, the main loop just waits for interrupts rather than repeatedly checking peripheral status. This ensures that sensor processing occurs at a consistent 100 Hz rate while the CPU remains idle and capable of performing other tasks between conversions.
+
+### DAC Self-Test
+
+For testing, the onboard DAC can be enabled using the ENABLE_DAC_SELFTEST flag. The DAC outputs a controlled voltage on PA4, the same physical pin used by the photoresistor ADC input. This allows the ADC-to-PWM portion of the system to be tested with a repeatable analog signal without changing the hardware, just by disconnecting the photoresistor voltage divider from PA4.
+
+The DAC is configured with no hardware trigger. Instead, its value is updated from the ADC conversion-complete callback. Therefore, TIM2 does not directly trigger the DAC.  This means that the DAC simply generates the value for the next ADC conversion, which is fine since all we are doing is sweeping through the approximate range of the photoresistor to tune transitioning and ensuring our LEDs are changing in brightness smmothly.
