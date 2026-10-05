@@ -187,7 +187,7 @@ For testing, the onboard DAC can be enabled using the ENABLE_DAC_SELFTEST flag. 
 The DAC is configured with no hardware trigger. Instead, its value is updated from the ADC conversion-complete callback. Therefore, TIM2 does not directly trigger the DAC.  This means that the DAC simply generates the value for the next ADC conversion, which is fine since all we are doing is sweeping through the approximate range of the photoresistor to tune transitioning and ensuring our LEDs are changing in brightness smmothly.
 
 ### Register trace
-For each ADC and timer setting configured in CubeMX, the register and bit field it sets, cited with the RM0390 section, and an explanation for the value can be found here [Link]()
+For each ADC and timer setting configured in CubeMX, the register and bit field it sets, cited with the RM0390 section, and an explanation for the value can be found here [Link](https://github.com/JosephVazha/NightLight/blob/Submission/RegTrace.md)
 
 ---
 
