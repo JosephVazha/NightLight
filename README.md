@@ -151,9 +151,11 @@ The system uses a hardware timer-triggered ADC and interrupt-driven processing t
 During normal operation, the photoresistor and fixed resistor form a voltage divider connected to PA4 (the Analog Digital Converter input). As the ambient light changes, the voltage at PA4 changes and is converted by the 12-bit ADC into a value from 0 to 4095.
 
 TIM2 provides the sampling clock for the system. It is configured with a pre-scaler of 8399 and a period of 99. 
+
 $$
 f_{TIM2}=\frac{84 MHz}{(8399+1)(99+1)} = 100Hz
 $$
+
 This generates a trigger output signal every 10 ms for the ADC. This allows the ADC to be sampled at a known fixed hardware-defined rate. We selected this value because we assumed that changes to ambient light indoors are typically made from turning on or off a switch or occluding light sources, which would change much slower than 10 ms. It would also likely be beyond the perception of a human. Sampling more frequently would provide very limited practiccal benefit, and unecessarily create more processing. We also validated this in our final end to end system test, where the response of the LEDs to the change in ambient light was as desired.
 
 
@@ -170,7 +172,7 @@ The calculated LED brightness values are converted into PWM duty cycles. A quadr
 The resulting duty cycles are written to the three TIM3 compare channels, which acts as the PWM generator. It operates at 1kHz, with a prescaler of 83 and a period of 999. 
 
 $$
-f_{PWM}=\frac{84 MHz}{(83+1)(999+1)}
+f_{PWM}=\frac{84 MHz}{(83+1)(999+1)} = 1 KHz
 $$
 
 This was chosen to make for potential easy debugging on a scope and provide fast enough LED toggling without a low-frequency flicker.
