@@ -396,21 +396,3 @@ Therefore:
 | CH3 | PB0 | Blue |
 
 ---
-
-## 4. PWM Compare Registers
-
-Unlike the timer frequency settings, the LED brightness is not fixed
-by CubeMX. The firmware changes the compare registers during operation.
-
-The relevant registers are:
-
-- `TIM3_CCR1` — red LED duty cycle
-- `TIM3_CCR2` — green LED duty cycle
-- `TIM3_CCR3` — blue LED duty cycle
-
-The firmware uses:
-
-```c
-__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, red);
-__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, green);
-__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, blue);
