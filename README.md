@@ -119,5 +119,8 @@ This provides a large ADC voltage range over the portion of the photoresistor's
 range that the nightlight is designed to use, while avoiding over-optimizing
 the circuit for the extreme 500 Ω and 1 MΩ measurements.
 
+<img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
+
+
 
 
