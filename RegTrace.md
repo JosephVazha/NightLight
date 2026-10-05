@@ -193,11 +193,9 @@ Its update event is routed through TRGO to the ADC.
 
 The prescaler divides the timer input clock by `PSC + 1`:
 
-\[
-\frac{84\text{ MHz}}{8399+1}
-=
-10\text{ kHz}
-\]
+$$
+\frac{84\text{ MHz}}{8399+1}= 10 KHz
+$$
 
 Therefore, the TIM2 counter increments every 100 μs.
 
@@ -216,13 +214,14 @@ update event.
 
 Therefore:
 
-\[
+
+$$
 f_{TIM2}
 =
-\frac{10\text{ kHz}}{100}
-=
-100\text{ Hz}
-\]
+\frac{10 kHz}{100}
+
+100 Hz
+$$
 
 TIM2 therefore generates an update event every 10 ms.
 
