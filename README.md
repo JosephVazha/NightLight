@@ -108,11 +108,11 @@ light levels, so a standard 22 kΩ resistor was selected.
 
 <img width="1336" height="769" alt="image" src="https://github.com/user-attachments/assets/77b6e8bd-7367-4f46-b72f-109151e9a3d8" />
 
-With \(R_{fixed}=22\,k\Omega\), the expected ADC voltage over the selected
+With a fixed resistor of 22kΩ, the expected ADC voltage over the selected
 operating range is approximately:
 
-- At high levels of ambient light, the photoresistor will measure 1 kΩ: \[V_{ADC} \approx 3.16\,V\]
-- At low  levels of ambient light, the photoresistor will measure 500 kΩ: \[V_{ADC} \approx 0.14\,V\]
+- High ambient light: $R_{LDR} \approx 1\,k\Omega$, so $V_{ADC} \approx 3.16\,V$
+- Low ambient light: $R_{LDR} \approx 500\,k\Omega$, so $V_{ADC} \approx 0.14\,V$
 
 This provides a large ADC voltage range over the portion of the photoresistor's
 range that the nightlight is designed to use, while avoiding over-optimizing
