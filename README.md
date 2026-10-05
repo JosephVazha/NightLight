@@ -175,7 +175,7 @@ $$
 f_{PWM}=\frac{84 MHz}{(83+1)(999+1)} = 1 KHz
 $$
 
-This was chosen to make for potential easy debugging on a scope and provide fast enough LED toggling without a low-frequency flicker.
+This was chosen to make for potential easy debugging on a scope and provide fast enough LED toggling to eliminate a low-frequency flicker.
 
 ### Event-Driven Operation
 The firmware does not continuously poll the ADC and does not use blocking delays. After initialization, the main loop just waits for interrupts rather than repeatedly checking peripheral status. This ensures that sensor processing occurs at a consistent 100 Hz rate while the CPU remains idle and capable of performing other tasks between conversions.
