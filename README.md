@@ -186,6 +186,8 @@ For testing, the onboard DAC can be enabled using the ENABLE_DAC_SELFTEST flag. 
 
 The DAC is configured with no hardware trigger. Instead, its value is updated from the ADC conversion-complete callback. Therefore, TIM2 does not directly trigger the DAC.  This means that the DAC simply generates the value for the next ADC conversion, which is fine since all we are doing is sweeping through the approximate range of the photoresistor to tune transitioning and ensuring our LEDs are changing in brightness smmothly.
 
+### Register trace
+For each ADC and timer setting configured in CubeMX, the register and bit field it sets, cited with the RM0390 section, and an explanation for the value can be found here [Link]()
 
 ---
 
@@ -212,4 +214,4 @@ With the DAC self-test working, I continuously swept the DAC through its range a
 
 ## End to End
 
-Finally I performed an end-to-end test, hooking in the photoresistor and varying the brightness by occluding the light with my hand. Initially, I had a minor additional issue, with the blue LED refusing to turn on, even at the darkest levels of my room. However, I realized that although I had pointed the LEDs in my circuit to face away from the photoresistor, the LEDs on the Nucleo dev baord were strong enough to interfere with the photoresistor, even though I had tried to place my breadboard on top of the dev boards LEDs to mititage this. By simply covering these with a thick cloth, before placing the breadboard. I was able to prevent this from interfering. Overall, I'm really happy with the result, as the transitions were really smooth and responded effectively to ambient light.: [Link](https://www.youtube.com/shorts/aKtNGqWCgg0)
+Finally I performed an end-to-end test, hooking in the photoresistor and varying the brightness by occluding the light with my hand. Initially, I had a minor additional issue, with the blue LED refusing to turn on, even at the darkest levels of my room. However, I realized that although I had pointed the LEDs in my circuit to face away from the photoresistor, the LEDs on the Nucleo dev baord were strong enough to interfere with the photoresistor, even though I had tried to place my breadboard on top of the dev boards LEDs to mititage this. By simply covering these with a thick cloth, before placing the breadboard. I was able to prevent this from interfering. Overall, I'm really happy with the result, as the transitions were really smooth and responded effectively to ambient light: [Link](https://www.youtube.com/shorts/aKtNGqWCgg0)
