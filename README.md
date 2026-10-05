@@ -138,7 +138,9 @@ We used PA6, PA7, and PB0 for the LEDs because they correspond to TIM3 channels 
 The complete circuit schematic is shown below.
 
 <img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
+
 ---
+
 # 2. Firmware
 ## System Architecture
 ### Data Flow
