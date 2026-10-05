@@ -44,8 +44,8 @@ The ADC is triggered periodically by a hardware timer, and all sensor processing
 | Red LED | RGB nightlight |
 | Green LED | RGB nightlight |
 | Blue LED | RGB nightlight |
-| [Resistor] | Photoresistor voltage divider |
-| [Resistors] | LED current limiting |
+| 1 x 22kΩ Resistor | Photoresistor voltage divider |
+| 3 x 200Ω Resistor | LED current limiting |
 | Breadboard | Circuit assembly |
 
 ---
@@ -65,5 +65,58 @@ The collected measurements were used to establish the operating range of the sen
 The resistance of the photoresistor increases almost exponentially as the amount of light decreases. Although these were arbitrarily chosen light levels and were not measured in lux, the results clearly show that the resistance increased sharply as the amount of light it was exposed to decreased. This agrees with external research, which shows that photoresistors have a nonlinear, approximately exponential relationship between resistance and light intensity, with resistance increasing substantially as illumination decreases.
 
 ### Circuit Design
+Although the photoresistor can reach extreme values from 500 Ω to 1 MΩ,
+the nightlight does not need to map the entire 0–3.3 V ADC range to useful LED
+brightness. Instead, we decided to optimize the nightlight for a resistance
+range of approximately 1 kΩ to 500 kΩ.
 
-Based on the measured resistance range, a voltage divider was designed:
+The photoresistor and fixed resistor form a series circuit. From Ohm's law:
+
+$$
+V=IR
+$$
+
+Since resistors in series carry the same current, their total resistance is:
+
+$$
+R_{total}=R_{LDR}+R_{fixed}
+$$
+
+Therefore, the current through the voltage divider is:
+
+$$
+I=\frac{3.3}{R_{LDR}+R_{fixed}}
+$$
+
+The ADC is connected across the fixed resistor, so the voltage measured by the
+ADC is:
+
+$$
+V_{ADC}=IR_{fixed}
+$$
+
+Substituting the expression for current gives the voltage-divider equation:
+
+$$
+V_{ADC}=3.3\frac{R_{fixed}}{R_{LDR}+R_{fixed}}
+$$
+
+I plotted the voltage-divider response in Desmos over the 1 kΩ to 500 kΩ
+operating range to determine a practical fixed resistance. A value around
+20 kΩ provided a good compromise between sensitivity at lower and higher
+light levels, so a standard 22 kΩ resistor was selected.
+
+<img width="1336" height="769" alt="image" src="https://github.com/user-attachments/assets/77b6e8bd-7367-4f46-b72f-109151e9a3d8" />
+
+With \(R_{fixed}=22\,k\Omega\), the expected ADC voltage over the selected
+operating range is approximately:
+
+- At high levels of ambient light, the photoresistor will measure 1 kΩ: \(V_{ADC}\approx3.16\,V\)
+-  At low  levels of ambient light, the photoresistor will measure 500 kΩ: \(V_{ADC}\approx0.14\,V\)
+
+This provides a large ADC voltage range over the portion of the photoresistor's
+range that the nightlight is designed to use, while avoiding over-optimizing
+the circuit for the extreme 500 Ω and 1 MΩ measurements.
+
+
+
