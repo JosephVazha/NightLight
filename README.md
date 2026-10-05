@@ -106,7 +106,8 @@ operating range to determine a practical fixed resistance. A value around
 20 kΩ provided a good compromise between sensitivity at lower and higher
 light levels, so a standard 22 kΩ resistor was selected.
 
-<img width="1336" height="769" alt="image" src="https://github.com/user-attachments/assets/77b6e8bd-7367-4f46-b72f-109151e9a3d8" />
+<img width="1270" height="836" alt="image" src="https://github.com/user-attachments/assets/6b569e64-9868-4f62-86a4-464a7e732e6b" />
+
 
 With a fixed resistor of 22kΩ, the expected ADC voltage over the selected
 operating range is approximately:
