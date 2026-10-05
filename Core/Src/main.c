@@ -118,11 +118,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
     }
 }
 
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
 	HAL_Init();
