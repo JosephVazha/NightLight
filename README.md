@@ -50,8 +50,8 @@ The ADC is triggered periodically by a hardware timer, and all sensor processing
 
 ---
 
-# 2. Characterization of the Photoresistor
-
+## Circuit Design
+### Photoresistor Characterization
 To characterize the photoresistor, its resistance was measured under different ambient light conditions using a multimeter while the photoresistor was exposed to several levels of illumination ranging from relatively dark conditions to bright light. For each lighting condition, the measured resistance was recorded.
 
 The purpose of this characterization was to determine the relationship between ambient light intensity and the resistance of the photoresistor. A photoresistor is a light-dependent resistor whose resistance generally decreases as the amount of incident light increases. Therefore, the measured resistance provides an indirect indication of the surrounding light level.
@@ -60,11 +60,9 @@ The collected measurements were used to establish the operating range of the sen
 
 <img width="597" height="372" alt="image" src="https://github.com/user-attachments/assets/7b443e7f-4694-4993-8e3e-dffda48b2c06" />
 
-### Results
-
 The resistance of the photoresistor increases almost exponentially as the amount of light decreases. Although these were arbitrarily chosen light levels and were not measured in lux, the results clearly show that the resistance increased sharply as the amount of light it was exposed to decreased. This agrees with external research, which shows that photoresistors have a nonlinear, approximately exponential relationship between resistance and light intensity, with resistance increasing substantially as illumination decreases.
 
-### Circuit Design
+### Photoresistor Voltage Divider 
 Although the photoresistor can reach extreme values from 500 Ω to 1 MΩ,
 the nightlight does not need to map the entire 0–3.3 V ADC range to useful LED
 brightness. Instead, we decided to optimize the nightlight for a resistance
@@ -119,8 +117,42 @@ This provides a large ADC voltage range over the portion of the photoresistor's
 range that the nightlight is designed to use, while avoiding over-optimizing
 the circuit for the extreme 500 Ω and 1 MΩ measurements.
 
+### LED Current Limiting 
+
+The forward voltage drop of an LED is color dependent, so we measured the forward voltage of each LED and used these measurements to estimate the current through the LEDs. The current-limiting resistor was selected using Ohm's law:
+
+$$
+R=\frac{V_{GPIO}-V_F}{I_{LED}}
+$$
+
+ST specifies that the GPIOs can source or sink up to 8 mA under the specified output-voltage conditions. The total current across the GPIOs must also remain within the device's absolute maximum ratings.
+
+We selected 200 Ω resistors for all three LEDs. Using the measured forward voltage of each LED, the expected current can be calculated as:
+
+$$
+I_{LED}=\frac{3.3-V_F}{200\Omega}
+$$
+
+For example, if the measured forward voltage of an LED is $V_F=2.0$ V:
+
+$$
+I_{LED}=\frac{3.3-2.0}{200}
+\approx 6.5\text{ mA}
+$$
+
+This keeps the LED current below the STM32's 8 mA GPIO specification under the normal output-voltage conditions while providing sufficient current for visible illumination. Although we do not know the exact current rating of the LED, by keeping the current Using a larger resistor would further reduce GPIO and LED current, but would also reduce the available LED brightness.
+
+Because the three LEDs are driven independently, the maximum combined LED current is approximately the sum of their individual currents. This remains well below the STM32F446RE's total GPIO current limits.
+
+### Final Schematic
+
+We used PA4 for the photoresistor because it can be configured as an ADC input and also supports DAC output on the same physical pin, which allows the onboard DAC to be connected to the ADC through PA4 during the self-test (where we simulate a photoresistor sweeping through resistance values) without requiring an additional pin.
+
+We used PA6, PA7, and PB0 for the LEDs because they correspond to TIM3 channels 1, 2, and 3, supporting TIM3 PWM outputs, allowing the LED brightness to be controlled directly by hardware timers. Using three channels of the same timer also allows all three LEDs to share the same frequency while their duty cycles are independently controlled.
+
 <img width="1207" height="737" alt="image" src="https://github.com/user-attachments/assets/73398cef-ec19-49ac-92fa-bb13ac3366db" />
 
+## Firmware Design
 
 
 
